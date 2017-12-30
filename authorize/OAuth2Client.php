@@ -78,4 +78,15 @@ class OAuth2Client extends Component
         return $this->provider->getAuthorizationUrl(['scope' => $this->scope]);
     }
 
+    /**
+     * @param string $code
+     * @return \League\OAuth2\Client\Token\AccessToken
+     */
+    public function getAccessToken($code)
+    {
+        return $this->provider->getAccessToken('authorization_code', [
+            'code' => $code
+        ]);
+    }
+
 }
