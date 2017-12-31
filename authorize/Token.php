@@ -57,10 +57,13 @@ class Token
      */
     public function save()
     {
+        $this->accessToken = $this->token->getToken();
+        $this->refreshToken = $this->token->getRefreshToken();
+        $this->expiresTime = $this->token->getExpires();
         \Yii::$app->session->set(static::ACCESS_TOKEN_SESSION_KEY, [
-            'access_token' => $this->token->getToken(),
-            'refresh_token' => $this->token->getRefreshToken(),
-            'expires_time' => $this->token->getExpires(),
+            'access_token' => $this->accessToken,
+            'refresh_token' => $this->refreshToken,
+            'expires_time' => $this->expiresTime,
         ]);
     }
 
@@ -110,6 +113,19 @@ class Token
     public function hasExpired()
     {
         return $this->expiresTime < time() - static::AHEAD_EXPIRES_TIME;
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        if (!in_array($name, ['getAccessToken', 'getRefreshToken'])) {
+            throw new \BadMethodCallException('No such method: ' . $name);
+        }
+        return call_user_func_array(array(new static(), $name), $arguments);
     }
 
 }

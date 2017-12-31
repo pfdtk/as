@@ -70,8 +70,9 @@ class IndexController extends Controller
         $code = \Yii::$app->request->get('code');
         try {
             $accessToken = $this->oauth2Client->getAccessToken($code);
-            $store = new Token($accessToken);
-            $store->save();
+            \Yii::createObject('app\authorize\Token', [$accessToken])->save();
+            $user = $this->oauth2Client->getResourceOwner($accessToken);
+            var_dump($user);exit;
             $this->redirect('/login/index/test');
         } catch (IdentityProviderException $exception) {
             $response = $exception->getResponseBody();

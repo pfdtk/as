@@ -3,6 +3,7 @@
 namespace app\authorize;
 
 use League\OAuth2\Client\Provider\GenericProvider;
+use League\OAuth2\Client\Token\AccessToken;
 use yii\base\Component;
 
 /**
@@ -58,16 +59,14 @@ class OAuth2Client extends Component
      */
     public function init()
     {
-        if (!$this->provider) {
-            $this->provider = new GenericProvider([
-                'clientId' => $this->clientId,
-                'clientSecret' => $this->clientSecret,
-                'redirectUri' => $this->redirectUri,
-                'urlAuthorize' => $this->urlAuthorize,
-                'urlAccessToken' => $this->urlAccessToken,
-                'urlResourceOwnerDetails' => $this->urlResourceOwnerDetails,
-            ]);
-        }
+        $this->provider = new GenericProvider([
+            'clientId' => $this->clientId,
+            'clientSecret' => $this->clientSecret,
+            'redirectUri' => $this->redirectUri,
+            'urlAuthorize' => $this->urlAuthorize,
+            'urlAccessToken' => $this->urlAccessToken,
+            'urlResourceOwnerDetails' => $this->urlResourceOwnerDetails,
+        ]);
     }
 
     /**
@@ -80,13 +79,23 @@ class OAuth2Client extends Component
 
     /**
      * @param string $code
-     * @return \League\OAuth2\Client\Token\AccessToken
+     * @return AccessToken
      */
     public function getAccessToken($code)
     {
         return $this->provider->getAccessToken('authorization_code', [
             'code' => $code
         ]);
+    }
+
+    /**
+     * @param AccessToken $accessToken
+     * @return array
+     */
+    public function getResourceOwner(AccessToken $accessToken)
+    {
+        $resourceOwner = $this->provider->getResourceOwner($accessToken);
+        return $resourceOwner->toArray();
     }
 
 }

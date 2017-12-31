@@ -8,7 +8,7 @@ return [
         'redirectUri' => 'http://sysyii.jhj.com/login/callback',
         'urlAuthorize' => 'http://sysyii_oauth.jhj.com/authorize',
         'urlAccessToken' => 'http://sysyii_oauth.jhj.com/authorize/access_token',
-        'urlResourceOwnerDetails' => 'http://sysyii_oauth.jhj.com/user',
+        'urlResourceOwnerDetails' => 'http://sysyii_oauth.jhj.com/user/info',
         'scope' => 'scope1',
     ],
 ];
