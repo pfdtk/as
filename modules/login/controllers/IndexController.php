@@ -59,7 +59,7 @@ class IndexController extends Controller
         $token = new Token();
         $accessToken = $token->getAccessToken();
         $refreshToken = $token->getRefreshToken();
-        return sprintf('AccessToken: %s, RefreshToken: %s', $accessToken, $refreshToken);
+        return sprintf('AccessToken: %s, RefreshToken: %s.', $accessToken, $refreshToken);
     }
 
     /**
