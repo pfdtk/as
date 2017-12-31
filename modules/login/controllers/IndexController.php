@@ -72,8 +72,7 @@ class IndexController extends Controller
             $accessToken = $this->oauth2Client->getAccessToken($code);
             \Yii::createObject('app\authorize\Token', [$accessToken])->save();
             $user = $this->oauth2Client->getResourceOwner($accessToken);
-            var_dump($user);exit;
-            $this->redirect('/login/index/test');
+            $this->redirect('/login/index/test?' . http_build_query($user));
         } catch (IdentityProviderException $exception) {
             $response = $exception->getResponseBody();
             $reason = isset($response['message']) ? $response['message'] : 'Invalid request';
