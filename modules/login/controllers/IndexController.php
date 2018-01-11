@@ -3,11 +3,11 @@
 namespace app\modules\login\controllers;
 
 use app\authorize\OAuth2Client;
+use app\modules\login\services\Login;
 use app\traits\JsonResponseTrait;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use yii\base\Module;
 use yii\web\Controller;
-use app\authorize\Token;
 
 /**
  * Class IndexController
@@ -24,19 +24,27 @@ class IndexController extends Controller
     private $oauth2Client;
 
     /**
+     * @var Login
+     */
+    private $loginService;
+
+    /**
      * IndexController constructor.
-     * @param $id
+     * @param string $id
      * @param Module $module
      * @param array $config
+     * @param Login $loginService
      */
     public function __construct(
         $id,
         Module $module,
-        array $config = []
+        array $config = [],
+        Login $loginService
     )
     {
         parent::__construct($id, $module, $config);
         $this->oauth2Client = \Yii::$app->get('oauth2_client');
+        $this->loginService = $loginService;
     }
 
     /**
@@ -46,20 +54,9 @@ class IndexController extends Controller
     {
         $user = \Yii::$app->user;
         if ($user && $user->getIdentity()) {
-            return $this->redirect('index/index/index');
+            return $this->redirect('/index/index/index');
         }
         return $this->redirect($this->oauth2Client->getAuthorizationUrl());
-    }
-
-    /**
-     * @throws \app\authorize\AccessTokenRestoreException
-     */
-    public function actionTest()
-    {
-        $token = new Token();
-        $accessToken = $token->getAccessToken();
-        $refreshToken = $token->getRefreshToken();
-        return sprintf('AccessToken: %s, RefreshToken: %s.', $accessToken, $refreshToken);
     }
 
     /**
@@ -72,7 +69,10 @@ class IndexController extends Controller
             $accessToken = $this->oauth2Client->getAccessToken($code);
             \Yii::createObject('app\authorize\Token', [$accessToken])->save();
             $user = $this->oauth2Client->getResourceOwner($accessToken);
-            $this->redirect('/login/index/test?' . http_build_query($user));
+            if ($login = $this->loginService->signin($user)) {
+                return $this->redirect('/login/index/index');
+            }
+            return 'Login fail.';
         } catch (IdentityProviderException $exception) {
             $response = $exception->getResponseBody();
             $reason = isset($response['message']) ? $response['message'] : 'Invalid request';

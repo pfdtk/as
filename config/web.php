@@ -23,6 +23,7 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'loginUrl' => '/login'
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -51,6 +52,10 @@ $config = [
         ],
     ],
     'params' => $params,
+    'as login' => [
+        'class' => \app\handlers\filters\Login::class,
+        'except' => ['login/*', 'debug/*', 'site/error'],
+    ],
 ];
 
 $config['components'] = array_merge($config['components'], require(__DIR__ . '/components.php'));
